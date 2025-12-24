@@ -5,6 +5,18 @@ All notable changes to the "idoapico" extension will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.1] - 2025-12-24
+
+### Added
+- Improved DeepSeek model support: more reliable tool-call parsing and handling, reduced partial-token leakage in streaming responses, and a system-prompt transformation that improves tool performance when tools are used.
+
+### Fixed
+- Prevented JSON/tool call arguments from leaking into the model reasoning display (DeepSeek, Kimi).
+- Improved stream error detection and reporting with clearer "Connection Error" messages and better status extraction.
+- Fixed partial tool-token buffering that could emit internal tokens in the chat UI.
+- Various parser robustness and reliability fixes.
+
+
 ## [0.1.0] - 2025-12-22
 
 ### Added
