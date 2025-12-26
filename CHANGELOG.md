@@ -5,6 +5,14 @@ All notable changes to the "idoapico" extension will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.1.3] - 2025-12-26
+
+### Fixed
+- Improved reliability for Kimi model tool calls: fixed an issue where tool-calls could be missed when tokens were split across streaming chunks.
+- Fixed handling of empty model responses and retry behavior so HTTP errors during retries are handled consistently (reduces inconsistent empty-response retries).
+- Reduced excessive retry aggressiveness to avoid generating extra requests against overloaded endpoints.
+
+
 ## [0.1.1] - 2025-12-24
 
 ### Added
