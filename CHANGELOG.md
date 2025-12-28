@@ -5,6 +5,20 @@ All notable changes to the "idoapico" extension will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.1.4] - 2025-12-29
+
+### Added
+- Improved DeepSeek support: DeepSeek V3 and R-series parser support and **XML-style tool-call parsing** (v3.2 hybrid format).
+- Comprehensive unit & integration tests and fixtures covering tool calls and reasoning flows.
+
+### Fixed
+- Fixed empty-response retry error handling to respect HTTP errors and avoid inconsistent retries.
+- Fixed Kimi tool-call reliability (missed tool-calls when tokens split across streaming chunks).
+
+### Changed
+- Reduced empty-response retry aggressiveness and improved provider error reporting.
+
+
 ## [v0.1.3] - 2025-12-26
 
 ### Fixed
