@@ -362,3 +362,51 @@ See LICENSE file for details.
 - **Issues**: Report bugs and feature requests on GitHub
 - **Debug Output**: Enable `idoapico.debug` and check Output > idoapico channel
 - **API Compatibility**: Ensure your endpoint is OpenAI-compatible
+
+### Kimi K2 Thinking Model Support (Moonshot AI)
+
+We now fully support Kimi K2 Thinking models with multi-step reasoning and tool use capabilities. Kimi K2 preserves reasoning history across multi-turn conversations for improved accuracy.
+
+#### Configuration
+
+```json
+{
+  "idoapico.models": [
+    {
+      "id": "kimi-k2-thinking",
+      "owned_by": "kimi",
+      "displayName": "Kimi K2 Thinking",
+      "baseUrl": "https://api.moonshot.ai/v1",
+      "parser": "kimi",
+      "thinking": true,
+      "enable_thinking": true,
+      "context_length": 256000,
+      "max_completion_tokens": 16000,
+      "temperature": 1.0,
+      "top_p": 0.9,
+      "top_k": 40,
+      "min_p": 0.0,
+      "presence_penalty": 0.0,
+      "repetition_penalty": 1.0,
+      "request_delay": 2000
+    }
+  ]
+}
+```
+
+#### Key Features
+
+- **Reasoning Content Preservation**: `reasoning_content` field is automatically preserved across multi-turn conversations
+- **Multi-Step Tool Calls**: Designed for complex tasks requiring sequential tool execution
+- **Streaming**: Always enabled for Kimi K2 to avoid timeout issues with large responses
+- **Token Budget**: Set `max_completion_tokens` ≥ 16,000 to ensure full reasoning + content fits
+
+#### Best Practices
+
+1. **Always Preserve Context**: Include full conversation history including `reasoning_content`
+2. **Enable Streaming**: Use `stream: true` (automatically set by parser)
+3. **Set Temperature to 1.0**: Recommended for optimal reasoning performance
+4. **Generous Token Limit**: Use 16K+ tokens to prevent truncation of reasoning chains
+5. **Rate Limiting**: Add `request_delay` (2000ms recommended) to respect API limits
+
+For more details, see the [Kimi K2 documentation](https://platform.moonshot.ai/docs/guide/use-kimi-k2-thinking-model).
