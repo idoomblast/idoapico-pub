@@ -4,6 +4,15 @@ All notable changes to the "idoapico" extension will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+
+### Fixed
+- **Kimi Deepinfra Endpoint Compatibility**: Fixed Kimi-K2-Thinking model to work correctly with Deepinfra endpoints (OpenAI format) while maintaining compatibility with Vertex AI (native Kimi tokens).
+  - Auto-detects response format (OpenAI vs native Kimi tokens) without requiring configuration changes
+  - Robust handling of tool calls across different endpoint formats
+  - Improved reliability for multi-turn conversations with reasoning content
+
 ## [v0.1.5] - 2025-12-30
 
 ### Added
