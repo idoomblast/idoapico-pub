@@ -8,10 +8,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
-- **Kimi Deepinfra Endpoint Compatibility**: Fixed Kimi-K2-Thinking model to work correctly with Deepinfra endpoints (OpenAI format) while maintaining compatibility with Vertex AI (native Kimi tokens).
-  - Auto-detects response format (OpenAI vs native Kimi tokens) without requiring configuration changes
-  - Robust handling of tool calls across different endpoint formats
-  - Improved reliability for multi-turn conversations with reasoning content
+
+### Added
+
+### Changed
+
+## [v0.2.1] - 2026-01-02
+
+### Fixed
+- **Chutes Proxy API Output Cleanup**: Fixed broken chat output when using Chutes Kimi K2 proxy that mixes thinking content, tool calls, and native tokens in single stream. Enhanced pattern matching to handle ASCII pipe tokens and complete JSON fragments, and applied cleanup to streaming path to prevent tokens/fragments from reaching UI. Eliminated leftover `</think>` tags and tool call arguments visible in chat UI.
+
+## [v0.2.0] - 2026-01-01
+
+### Added
+- **Kimi-K2-Thinking Deepinfra Compatibility**: Added automatic detection of OpenAI vs native Kimi token formats, enabling seamless use of Kimi-K2-Thinking with Deepinfra endpoints without manual configuration.
 
 ## [v0.1.5] - 2025-12-30
 
