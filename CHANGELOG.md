@@ -5,13 +5,16 @@ All notable changes to the "idoapico" extension will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
-
-### Fixed
+## [v0.2.2] - 2026-01-05
 
 ### Added
+- **Real-Time Token Rate Display**: Added live token rate (tokens/second) during streaming responses. Rate appears in status bar alongside token counts and persists after stream completes.
+- **Configurable Rate Update Interval**: Added `tokenRateUpdateInterval` setting to control status bar update frequency (default: 200ms). Set to 0 for immediate updates during debugging.
 
-### Changed
+### Fixed
+- **Chutes Proxy Output Cleanup**: Fixed chat output contamination when using Chutes Kimi K2 proxy. Tool call JSON and native tokens were visible in chat UI; now properly cleaned from both streaming and final responses.
+- **Tool Call Duplicate Prevention**: Fixed issue where duplicate tool calls could be emitted in certain edge cases during parsing.
+- **Reasoning Content Preservation**: Improved handling of reasoning content to ensure it's properly preserved across multi-turn conversations with thinking models.
 
 ## [v0.2.1] - 2026-01-02
 
