@@ -5,6 +5,13 @@ All notable changes to the "idoapico" extension will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+## [v0.2.3] - 2026-01-13
+
+### Fixed
+- **GLM-4.7 Vertex AI XML Tag Cleanup**: Fixed XML `<tool_call>` tags leaking into chat UI when using GLM-4.7 models. Tags and surrounding content are now properly removed before display.
+
 ## [v0.2.2] - 2026-01-05
 
 ### Added
