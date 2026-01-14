@@ -315,6 +315,28 @@ We now support GPT-OSS models (Vertex AI MaaS). You can add GPT-OSS models to yo
   ]
 }
 ```
+
+### MiniMax M2.1 Configuration:
+```json
+{
+  "idoapico.models": [
+    {
+      "id": "MiniMax-M2.1",
+      "owned_by": "minimax",
+      "displayName": "MiniMax M2.1",
+      "baseUrl": "https://api.minimax.io/v1",
+      "context_length": 128000,
+      "max_completion_tokens": 4096,
+      "temperature": 1.0,
+      "extra": {
+        "reasoning_split": true
+      }
+    }
+  ]
+}
+```
+For more details, see [MiniMax M2.1 Support](#minimax-m21-support) below.
+
 ### 2. Set API Keys
 
 Use the command palette to set API keys:
@@ -410,3 +432,84 @@ We now fully support Kimi K2 Thinking models with multi-step reasoning and tool 
 5. **Rate Limiting**: Add `request_delay` (2000ms recommended) to respect API limits
 
 For more details, see the [Kimi K2 documentation](https://platform.moonshot.ai/docs/guide/use-kimi-k2-thinking-model).
+
+### MiniMax M2.1 Support
+
+We fully support MiniMax M2.1 models with native tool calling and interleaved thinking capabilities. MiniMax M2.1 provides excellent performance for coding and agentic tasks with state-of-the-art results on SWE-bench and other benchmarks.
+
+#### Configuration
+
+```json
+{
+  "idoapico.models": [
+    {
+      "id": "MiniMax-M2.1",
+      "owned_by": "minimax",
+      "displayName": "MiniMax M2.1",
+      "baseUrl": "https://api.minimax.io/v1",
+      "context_length": 128000,
+      "max_completion_tokens": 4096,
+      "temperature": 1.0,
+      "extra": {
+        "reasoning_split": true
+      }
+    }
+  ]
+}
+```
+
+**International users**: Use `https://api.minimax.io/v1`  
+**Users in China**: Use `https://api.minimaxi.com/v1`
+
+#### Key Features
+
+- **Native Reasoning Support**: Automatically extracts reasoning from `response_details` field when `reasoning_split: true`
+- **Tool Calling**: Excellent tool use capabilities with XML `<minimax:tool_call>` format support
+- **Interleaved Thinking**: Models reason between tool calls for complex multi-step tasks
+- **OpenAI Compatibility**: Full OpenAI API format support with automatic parser selection
+- **Model Variants**: Support for M2.1 (standard) and M2.1-lightning (faster)
+
+#### Configuration Options
+
+**Enable Separate Reasoning Output:**
+```json
+{
+  "extra": {
+    "reasoning_split": true
+  }
+}
+```
+
+**MiniMax M2.1 Lightning (faster, 100 tps):**
+```json
+{
+  "id": "MiniMax-M2.1-lightning",
+  "owned_by": "minimax",
+  "displayName": "MiniMax M2.1 Lightning"
+}
+```
+
+#### Best Practices
+
+1. **Enable Reasoning Split**: Set `extra.reasoning_split: true` to separate thinking from content
+2. **Preserve Context**: Always include full model responses (including `reasoning_details`) in conversation history for multi-turn interactions
+3. **Temperature**: Use `1.0` (recommended by MiniMax for optimal performance)
+4. **Tool Use**: MiniMax M2.1 excels at complex tool workflows - no special configuration needed
+5. **Rate Limiting**: Add `request_delay` if you encounter rate limits (2000ms recommended)
+
+#### Troubleshooting
+
+**No reasoning output:**
+- Ensure `extra.reasoning_split: true` is set in model configuration
+- Verify you're using a model that supports interleaved thinking (MiniMax-M2.1)
+
+**Tool calls not working:**
+- MiniMax M2.1 supports both OpenAI format and XML tool calls automatically
+- Check that tools are properly configured in the requesting extension
+- Verify API key has necessary permissions
+
+**Authentication errors:**
+- Verify API key is set correctly using `idoapico: Set Provider API Key` command
+- Check that `baseUrl` matches your region (international vs China)
+
+For more details, see the [MiniMax Platform Documentation](https://platform.minimax.io/).

@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v0.2.4] - 2026-01-14
+
+### Added
+- **MiniMax M2.1 Model Support**: Added comprehensive support for MiniMax M2.1 models with native reasoning capabilities and tool calling.
+  - **Parser Support**: New MiniMaxParser that extracts reasoning from native `response_details` field
+  - **Configuration**: Full model configuration support with `reasoning_split` parameter for interleaved thinking
+  - **Tool Calling**: Excellent tool use capabilities with both OpenAI-compatible and XML tool formats
+  - **Documentation**: Complete configuration guide and usage examples in README
+  - **Testing**: Comprehensive unit tests covering all parser functionality and edge cases
+  - **API Compatibility**: Support for both international and China endpoints
+
 ## [v0.2.3] - 2026-01-13
 
 ### Fixed
