@@ -6,6 +6,34 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+## [v0.2.5] - 2026-01-15
+
+### Added
+- **MiniMax M2.1 Native Tool Call Support**: Enhanced tool calling capabilities with native XML format parsing
+  - Parses `<minimax:tool_call>` format with `<invoke>` and `<parameter>` tags
+  - Handles escaped quotes and automatic type conversion
+  - Works transparently alongside OpenAI format and generic XML format
+  - Full backward compatibility maintained
+
+### Fixed
+- **MiniMax Parser Stability**: Fixed TypeScript compilation errors in MiniMax parser class structure
+  - Resolved duplicate method declarations
+  - Fixed premature class closure
+  - Improved code organization (184 lines vs 271 lines previously)
+## [v2.3.5] - 2026-01-15
+
+### Added
+- **MiniMax M2.1 Native XML Tool Calls**: Added support for MiniMax native `<minimax:tool_call>` format
+  - Automatically parses MiniMax native XML tool calls with `<invoke>` and `<parameter>` tags
+  - Handles escaped quotes and converts parameter values to appropriate types
+  - Works alongside OpenAI format and generic XML format without interference
+  - Full test coverage with 19 unit tests passing
+
+### Fixed
+- **MiniMax Parser Stability**: Fixed TypeScript compilation errors in MiniMax parser
+  - Resolved class structure issues causing duplicate methods
+  - Improved code organization and reduced file size (271 → 184 lines)
+  - All unit tests passing
 
 ## [v0.2.4] - 2026-01-14
 
