@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v0.2.8] - 2026-05-15
+
+### Added
+- Model configuration overrides in `IdOpenAiCompatibilityProvider` for dynamic adjustments based on user input.
+- Improved thinking/reasoning content handling for a smoother chat experience.
+
+### Changed
+- Simplified `copilot-instructions.md` to reference external docs instead of bundling full content, reducing extension size.
+
 ## [v0.2.7] - 2026-05-15
 
 ### Added

@@ -21,12 +21,226 @@ A VS Code extension that integrates OpenAI-compatible models (including Kimi K2,
 
 ## Requirements
 
+- VS Code Insiders, or VS Code started with `--enable-proposed-api=idoomblast.idoapico`
 - VS Code 1.106.1 or higher
 - An OpenAI-compatible API endpoint or API key (OpenAI, Azure OpenAI, etc.)
+
+This extension uses the proposed `chatProvider` API. If you install the packaged `.vsix` into a regular VS Code session without enabling that proposal, provider registration will fail with `CANNOT use API Proposal chatProvider`.
 
 ## Extension Settings
 
 This extension contributes the following configuration options:
+
+### Manage Models (`chatLanguageModels.json`) - Preferred
+
+On current VS Code builds, the preferred configuration path is **Manage Models** and the generated `chatLanguageModels.json` file. The `idoapico` provider supports both of the following shapes:
+
+1. A single-model provider group, where the root entry contains `modelId`.
+2. A grouped provider entry, where the root entry contains shared settings plus a `models` array.
+
+The grouped form is recommended when multiple models share the same API root and API key.
+
+#### Supported Shapes
+
+**Single-model provider group**
+
+```json
+{
+  "name": "IDOOM AI",
+  "vendor": "idoapico",
+  "provider": "idoomAI",
+  "modelId": "go/deepseek-v4-flash",
+  "displayName": "DeepSeek v4 Flash GO",
+  "baseUrl": "https://ai.idoom.me/v1",
+  "apiKey": "${input:chat.lm.secret.6402420c}"
+}
+```
+
+**Grouped provider entry**
+
+```json
+{
+  "name": "IdoomAI",
+  "vendor": "idoapico",
+  "provider": "idoomAI",
+  "apiKey": "${input:chat.lm.secret.-3a2aa0b0}",
+  "baseUrl": "https://open.bigmodel.cn/api/coding/paas/v4",
+  "models": [
+    {
+      "id": "GLM-4.7",
+      "name": "GLM-4.7"
+    },
+    {
+      "id": "GLM-5.1",
+      "name": "GLM-5.1"
+    }
+  ]
+}
+```
+
+#### Provider Group Fields
+
+The following fields are supported at the root level of an `idoapico` provider-group entry in `chatLanguageModels.json`:
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `name` | `string` | Yes | The label shown by VS Code for the provider group. |
+| `vendor` | `string` | Yes | Must be `idoapico`. |
+| `provider` | `string` | No | Optional provider label used for logging, parser defaults, and API key lookup. |
+| `apiKey` | `string` | No | API key stored through VS Code secret interpolation, for example `${input:chat.lm.secret.xxx}`. |
+| `baseUrl` | `string` | Yes | The API root for the provider group. Use the API root such as `https://api.example.com/v1`, not the final `/chat/completions` endpoint. |
+| `modelId` | `string` | Yes for single-model shape | Model identifier sent in the request body when using the single-model shape. |
+| `displayName` | `string` | No | Optional display label for the single-model shape. |
+| `family` | `string` | No | Default family hint used for parser selection and model grouping. |
+| `parser` | `string` | No | Explicit parser override. Supported values: `openai`, `anthropic`, `kimi`, `gemini`, `generic`, `gptoss`, `deepseekrseries`, `deepseekv3`. |
+| `vision` | `boolean` | No | Default image-input capability for the single-model shape or for models in a grouped entry. |
+| `toolCalling` | `boolean` | No | Default tool-calling capability hint advertised to VS Code. |
+| `contextLength` | `number` | No | Default total context window in tokens. |
+| `maxCompletionTokens` | `number` | No | Default maximum output tokens. |
+| `requestDelay` | `number` | No | Default request delay in milliseconds for this group. |
+| `headers` | `object` | No | Default extra HTTP headers. |
+| `extra` | `object` | No | Default extra request-body fields. If a key here overlaps with a generated request key, `extra` wins. |
+| `systemReplace` | `array` | No | Default system-message replacement rules applied before the request is sent. |
+| `thinkingMode` | `string` | No | Default `thinking.type` value. Supported values: `enabled`, `disabled`. |
+| `enableThinking` | `boolean` | No | Default `enable_thinking` flag for providers such as Kimi. |
+| `thinkingBudget` | `number` | No | Default `thinking_budget` for compatible providers. |
+| `editTools` | `array` | No | Default edit-tool hints exposed to VS Code. |
+| `models` | `array` | Yes for grouped shape | Array of per-model definitions that inherit the root configuration. |
+| `settings` | `object` | No | VS Code-managed per-model override block. Keys must match the returned model `id` or `id::configId`. |
+
+#### `models[]` Fields
+
+Each item in `models[]` represents one model exposed under the same provider group.
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `id` | `string` | Yes | Model identifier sent as `model` in the API request. |
+| `configId` | `string` | No | Optional suffix that makes duplicate model IDs unique in the picker. The final exposed ID becomes `id::configId`. |
+| `name` | `string` | No | Display name shown in the picker. |
+| `displayName` | `string` | No | Alias for `name`. |
+| `provider` | `string` | No | Per-model override for the provider label used by logging, parser defaults, and API key lookup. |
+| `baseUrl` | `string` | No | Per-model API root override. This must still be an API root such as `https://api.example.com/v1`. |
+| `family` | `string` | No | Per-model family hint used for parser selection. |
+| `parser` | `string` | No | Per-model parser override. |
+| `vision` | `boolean` | No | Whether the model accepts image input. |
+| `toolCalling` | `boolean` | No | Capability hint for whether the model should advertise tool calling. |
+| `contextLength` | `number` | No | Total context window in tokens. |
+| `maxInputTokens` | `number` | No | Input-token budget. When provided with `maxOutputTokens`, the extension derives `contextLength = maxInputTokens + maxOutputTokens`. |
+| `maxOutputTokens` | `number` | No | Output-token budget used to derive `maxCompletionTokens`. |
+| `maxCompletionTokens` | `number` | No | Explicit maximum output tokens. |
+| `maxTokens` | `number` | No | Legacy alias for `maxCompletionTokens`. |
+| `temperature` | `number \| null` | No | Sampling temperature. |
+| `topP` | `number \| null` | No | Top-p sampling value. |
+| `topK` | `number` | No | Top-k sampling value. |
+| `minP` | `number` | No | Minimum probability threshold. |
+| `frequencyPenalty` | `number` | No | Frequency penalty sent to the API. |
+| `presencePenalty` | `number` | No | Presence penalty sent to the API. |
+| `repetitionPenalty` | `number` | No | Repetition penalty sent to the API. |
+| `reasoningEffort` | `string` | No | Top-level reasoning effort. Supported values: `none`, `minimal`, `low`, `medium`, `high`, `max`, `xhigh`. |
+| `reasoning` | `object` | No | Advanced reasoning object with `effort`, `exclude`, `max_tokens`, and `enabled`. |
+| `thinking` | `boolean \| object` | No | Convenience field for thinking mode. `true` maps to `{ "type": "enabled" }`, `false` maps to `{ "type": "disabled" }`. |
+| `thinkingMode` | `string` | No | Explicit `thinking.type` override with `enabled` or `disabled`. |
+| `enableThinking` | `boolean` | No | Explicit `enable_thinking` override. |
+| `thinkingBudget` | `number` | No | Explicit `thinking_budget` override. |
+| `headers` | `object` | No | Additional per-model HTTP headers merged on top of root headers. |
+| `extra` | `object` | No | Additional per-model request-body fields merged on top of root `extra`. |
+| `requestDelay` | `number` | No | Per-model delay before a request is sent. |
+| `editTools` | `array` | No | Per-model edit-tool hints. |
+| `systemReplace` | `array` | No | Per-model system-message replacement rules appended after root-level rules. |
+
+#### `settings` Overrides
+
+The `settings` object in `chatLanguageModels.json` is the per-model override store that VS Code uses for Manage Models. The keys must match the exposed model `id` or `id::configId` exactly.
+
+Supported override keys:
+
+| Key | Type | Description |
+| --- | --- | --- |
+| `temperature` | `number \| null` | Override model temperature. |
+| `topP` | `number \| null` | Override top-p sampling. |
+| `topK` | `number` | Override top-k sampling. |
+| `minP` | `number` | Override minimum probability threshold. |
+| `frequencyPenalty` | `number` | Override frequency penalty. |
+| `presencePenalty` | `number` | Override presence penalty. |
+| `repetitionPenalty` | `number` | Override repetition penalty. |
+| `maxCompletionTokens` | `number` | Override output-token limit. |
+| `requestDelay` | `number` | Override the request delay in milliseconds. |
+| `reasoningEffort` | `string` | Override top-level reasoning effort. |
+| `thinkingMode` | `string` | Override `thinking.type`. |
+| `enableThinking` | `boolean` | Override `enable_thinking`. |
+| `thinkingBudget` | `number` | Override `thinking_budget`. |
+
+#### Inheritance and Precedence
+
+Configuration is resolved in the following order:
+
+1. Root provider-group defaults.
+2. Per-model values inside `models[]`.
+3. Per-model `settings` overrides created by Manage Models.
+4. `extra` request-body keys, which always win if they overlap with generated request fields.
+
+Special rules:
+
+- Root-level `systemReplace` is inherited by every model in the group.
+- Per-model `systemReplace` rules are appended after the root rules.
+- `thinking: true` is treated as `thinkingMode: "enabled"` plus `enableThinking: true` when no explicit thinking overrides are set.
+- `maxInputTokens` plus `maxOutputTokens` can be used instead of manually calculating `contextLength`.
+
+#### Grouped Provider Example
+
+```json
+[
+  {
+    "name": "IdoomAI",
+    "vendor": "idoapico",
+    "provider": "idoomAI",
+    "apiKey": "${input:chat.lm.secret.-3a2aa0b0}",
+    "baseUrl": "https://open.bigmodel.cn/api/coding/paas/v4",
+    "systemReplace": [
+      {
+        "pattern": "You are an AI assistant",
+        "replacement": "You are a coding expert",
+        "flags": "g"
+      }
+    ],
+    "models": [
+      {
+        "id": "GLM-4.7",
+        "name": "GLM-4.7",
+        "vision": false,
+        "toolCalling": false,
+        "maxInputTokens": 200000,
+        "maxOutputTokens": 128000,
+        "thinking": true
+      },
+      {
+        "id": "GLM-5.1",
+        "name": "GLM-5.1",
+        "toolCalling": true,
+        "vision": false,
+        "maxInputTokens": 200000,
+        "maxOutputTokens": 128000,
+        "thinking": true,
+        "systemReplace": [
+          {
+            "pattern": "helpful assistant",
+            "replacement": "rigorous coding assistant",
+            "flags": "g"
+          }
+        ]
+      }
+    ],
+    "settings": {
+      "GLM-5.1": {
+        "reasoningEffort": "xhigh",
+        "thinkingBudget": 12000
+      }
+    }
+  }
+]
+```
+
+This example exposes two models from one provider group, shares the same root `baseUrl` and `apiKey`, inherits root-level `systemReplace`, and applies a per-model `settings` override to `GLM-5.1`.
 
 ### Core Settings
 
@@ -42,7 +256,9 @@ Optional fields:
 - `context_length` - Max context in tokens (default: 128000)
 - `max_completion_tokens` - Max output tokens (default: 4096)
 - `max_tokens` - Alternative name for max_completion_tokens (legacy)
+- `reasoning_effort` - Top-level reasoning effort for compatible providers. DeepSeek chat models support `high` and `max`; `xhigh` remains available as a compatibility alias.
 - `vision` - Boolean, whether model supports image input (default: false)
+- `toolCalling` - Capability hint for whether the model should advertise tool calling in the picker
 - `headers` - Custom HTTP headers as key-value pairs
 - `extra` - Additional fields to send with API requests
 - `parser` - Override parser: "openai", "kimi", "anthropic", "gemini", "generic" (auto-detected by default)
@@ -148,7 +364,7 @@ Available for models that support them:
 #### Reasoning Configuration
 ```json
 "reasoning": {
-  "effort": "high|medium|low|minimal|auto",
+  "effort": "none|minimal|low|medium|high|max|xhigh|auto",
   "exclude": false,
   "max_tokens": 10000,
   "enabled": true
@@ -164,6 +380,70 @@ Available for models that support them:
 "thinking_budget": 10000
 ```
 
+For Manage Models and `chatLanguageModels.json`, the official camelCase equivalents are:
+
+```json
+{
+  "thinkingMode": "enabled",
+  "enableThinking": true,
+  "thinkingBudget": 10000,
+  "reasoningEffort": "max"
+}
+```
+
+This covers the common Kimi and DeepSeek variant use cases without needing `extra`. If both official fields and `extra` provide the same request key, `extra` still wins as the final override.
+
+You can also expose multiple models from one provider group by keeping `baseUrl` and `apiKey` at the root and listing the models under `models`. Each `models[]` entry can define its own `name`, token limits, thinking settings, parser/family overrides, tool capability hints, and `systemReplace` rules.
+
+Use the API root in `baseUrl`, for example `https://open.bigmodel.cn/api/coding/paas/v4`, not the final `/chat/completions` URL.
+
+```json
+[
+  {
+    "name": "IdoomAI",
+    "vendor": "idoapico",
+    "apiKey": "${input:chat.lm.secret.-3a2aa0b0}",
+    "baseUrl": "https://open.bigmodel.cn/api/coding/paas/v4",
+    "systemReplace": [
+      {
+        "pattern": "You are an AI assistant",
+        "replacement": "You are a coding expert",
+        "flags": "g"
+      }
+    ],
+    "models": [
+      {
+        "id": "GLM-4.7",
+        "name": "GLM-4.7",
+        "vision": false,
+        "toolCalling": false,
+        "maxInputTokens": 200000,
+        "maxOutputTokens": 128000,
+        "thinking": true
+      },
+      {
+        "id": "GLM-5.1",
+        "name": "GLM-5.1",
+        "toolCalling": true,
+        "vision": false,
+        "maxInputTokens": 200000,
+        "maxOutputTokens": 128000,
+        "thinking": true,
+        "systemReplace": [
+          {
+            "pattern": "helpful assistant",
+            "replacement": "rigorous coding assistant",
+            "flags": "g"
+          }
+        ]
+      }
+    ]
+  }
+]
+```
+
+Root-level `systemReplace` is inherited by every model in the group, and each model can append its own extra replacements.
+
 ## Commands
 
 - **`idoapico: Set Generic API Key`** - Set API key for all providers
@@ -173,6 +453,16 @@ Available for models that support them:
 - **`idoapico: Reset Token Session`** - Reset session token counter
 
 ## Quick Start
+
+### 0. Run With Proposed API Enabled
+
+For development, use the included launch configuration in [.vscode/launch.json](.vscode/launch.json), which starts VS Code Insiders with `--enable-proposed-api=idoomblast.idoapico`.
+
+For a packaged `.vsix`, launch VS Code with the same flag before testing the extension:
+
+```bash
+code-insiders --enable-proposed-api=idoomblast.idoapico
+```
 
 ### 1. Configure Models
 
