@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v0.2.7] - 2026-05-15
+
+### Added
+- Official Manage Models support for `thinkingMode`, `enableThinking`, and `thinkingBudget`, so common Kimi and DeepSeek variants no longer need `extra`.
+- Manage Models provider groups can now expose multiple models from one shared root `baseUrl` and `apiKey` using `models: []`, including per-model `systemReplace` and tool capability hints.
+
+### Fixed
+- Added clearer startup guidance when the proposed `chatProvider` API is not enabled, including the required `--enable-proposed-api=idoomblast.idoapico` runtime flag for packaged installs.
+- Accepted DeepSeek `reasoningEffort: "max"` in Manage Models and legacy model configuration.
+
 ## [v0.2.6] - 2026-01-28
 
 ### Added
